@@ -152,14 +152,47 @@ This ensures that if the number is `5`, it displays as `05`. It "pads" the start
       return <Stopwatch />;
     }
     ```
-The Code
---------------------
- ```
+```jsx
+import React from "react";
+import Stopwatch from "./components/Stopwatch";
 
-     Import React and the hooks we need
-      import React, { useState, useEffect, useRef } from "react";
+function App() {
+  return (
+    <div>
+      <h1>Stopwatch Example</h1>
+      <Stopwatch />
+    </div>
+  );
+}
 
-    function Stopwatch() {
+export default App;
+```
+
+No props required. The component maintains its own internal state.
+
+## Implementation Details
+
+- State:
+  - `isRunning` (boolean) — whether the stopwatch is currently running.
+  - `elapsedTime` (number, ms) — the accumulated elapsed time.
+
+- Refs:
+  - `intervalRef` — stores the interval ID so it can be cleared.
+  - `startTimeRef` — stores Date.now() at the moment the stopwatch was (re)started. When resuming the stopwatch, this is set to `Date.now() - elapsedTime` so the interval reads the correct accumulated time.
+
+- Timing:
+  - An interval set to run every 10ms updates `elapsedTime` using `Date.now() - startTimeRef.current`. That value represents the full elapsed milliseconds since the stopwatch was first started (taking into account previous elapsed time via start time adjustment).
+
+- Cleanup:
+  - The effect's cleanup clears the interval to avoid memory leaks when the component stops running or unmounts.
+
+## Full source
+
+```jsx
+// Import React and the hooks we need
+import React, { useState, useEffect, useRef } from "react";
+
+function Stopwatch() {
     // ---------------- STATE ----------------
     // Tracks whether the stopwatch is running (true/false)
     const [isRunning, setIsRunning] = useState(false);
@@ -256,4 +289,4 @@ The Code
 
 // Export component so it can be used in App.js
 export default Stopwatch;
-    
+```
